@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { connectDB } from "@/lib/db/connect";
 import Character from "@/lib/db/models/character";
 import Conversation from "@/lib/db/models/conversation";
-import anthropic from "@/lib/claude";
+import gemini from "@/lib/gemini";
 import { getSessionId, badRequest, notFound, serverError } from "@/lib/api-helpers";
 
 // POST /api/chat — streaming roleplay chat
@@ -34,19 +34,18 @@ export async function POST(request: NextRequest) {
       conversation = await Conversation.create({ characterId, sessionId, messages: [] });
     }
 
-    // Build message history for Claude (last 40 messages to stay within context)
-    const history = conversation.messages.slice(-40).map((m) => ({
-      role: m.role as "user" | "assistant",
-      content: m.content,
+    // Build message history for Gemini (last 40 messages, "assistant" → "model")
+    const contents = conversation.messages.slice(-40).map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
     }));
-    history.push({ role: "user", content: message.trim() });
+    contents.push({ role: "user", parts: [{ text: message.trim() }] });
 
-    // Stream from Claude
-    const claudeStream = anthropic.messages.stream({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2048,
-      system: character.systemPrompt,
-      messages: history,
+    // Stream from Gemini
+    const geminiStream = await gemini.models.generateContentStream({
+      model: "gemini-2.5-flash",
+      config: { systemInstruction: character.systemPrompt },
+      contents,
     });
 
     const encoder = new TextEncoder();
@@ -55,17 +54,15 @@ export async function POST(request: NextRequest) {
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          for await (const event of claudeStream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              const text = event.delta.text;
+          for await (const chunk of geminiStream) {
+            const text = chunk.text ?? "";
+            if (text) {
               fullText += text;
               controller.enqueue(encoder.encode(text));
             }
           }
         } catch (err) {
+          console.error("[chat] stream error:", err);
           controller.error(err);
           return;
         }
@@ -96,7 +93,8 @@ export async function POST(request: NextRequest) {
         "Cache-Control": "no-cache",
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("[chat] outer error:", err);
     return serverError();
   }
 }
