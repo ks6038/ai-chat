@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -9,12 +10,14 @@ interface ConversationSidebarProps {
   conversations: IConversation[];
   activeId: string | null;
   onSelect: (conversation: IConversation) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function ConversationSidebar({
   conversations,
   activeId,
   onSelect,
+  onDelete,
 }: ConversationSidebarProps) {
   if (conversations.length === 0) {
     return (
@@ -38,11 +41,11 @@ export default function ConversationSidebar({
             const isActive = conv._id === activeId;
 
             return (
-              <li key={conv._id}>
+              <li key={conv._id} className="group relative">
                 <button
                   onClick={() => onSelect(conv)}
                   className={cn(
-                    "w-full rounded-lg px-3 py-2.5 text-left text-xs transition-colors",
+                    "w-full rounded-lg px-3 py-2.5 pr-8 text-left text-xs transition-colors",
                     isActive
                       ? "bg-gray-200 text-gray-900"
                       : "text-gray-600 hover:bg-gray-100"
@@ -55,6 +58,13 @@ export default function ConversationSidebar({
                       day: "numeric",
                     })}
                   </p>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onDelete(conv._id); }}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 hidden rounded p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-700 group-hover:flex"
+                  aria-label="대화 삭제"
+                >
+                  <X className="h-3 w-3" />
                 </button>
               </li>
             );

@@ -6,6 +6,27 @@ import { getSessionId, notFound, forbidden, serverError } from "@/lib/api-helper
 
 type Params = { params: Promise<{ id: string }> };
 
+// DELETE /api/conversations/[id]
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const { id } = await params;
+  if (!mongoose.Types.ObjectId.isValid(id)) return notFound();
+
+  const sessionId = getSessionId(request);
+
+  try {
+    await connectDB();
+
+    const conversation = await Conversation.findById(id).lean();
+    if (!conversation) return notFound();
+    if (conversation.sessionId !== sessionId) return forbidden();
+
+    await Conversation.findByIdAndDelete(id);
+    return new NextResponse(null, { status: 204 });
+  } catch {
+    return serverError();
+  }
+}
+
 // GET /api/conversations/[id] — full conversation with messages
 export async function GET(request: NextRequest, { params }: Params) {
   const { id } = await params;

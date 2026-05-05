@@ -55,6 +55,16 @@ export default function ChatInterface({ character }: ChatInterfaceProps) {
     setMessages([]);
   }
 
+  async function deleteConversation(id: string) {
+    if (!sessionId) return;
+    await fetch(`/api/conversations/${id}`, {
+      method: "DELETE",
+      headers: { "x-session-id": sessionId },
+    }).catch(console.error);
+    setConversations((prev) => prev.filter((c) => c._id !== id));
+    if (conversationId === id) startNewConversation();
+  }
+
   const sendMessage = useCallback(
     async (userMessage: string) => {
       if (!sessionId || streaming) return;
@@ -128,6 +138,7 @@ export default function ChatInterface({ character }: ChatInterfaceProps) {
         conversations={conversations}
         activeId={conversationId}
         onSelect={selectConversation}
+        onDelete={deleteConversation}
       />
 
       {/* Main chat area */}
