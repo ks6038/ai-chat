@@ -3,7 +3,28 @@
     "allow": [
       "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
       "Bash(mv CLAUDE.md /tmp/CLAUDE.md)",
-      "Bash(mv TODO.md /tmp/TODO.md)"
+      "Bash(mv TODO.md /tmp/TODO.md)",
+      "Bash(mv /tmp/CLAUDE.md \"D:\\\\GitHub\\\\06_ETC\\\\ai-chat\\\\CLAUDE.md\")",
+      "Bash(mv /tmp/TODO.md \"D:\\\\GitHub\\\\06_ETC\\\\ai-chat\\\\TODO.md\")",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npm run *)",
+      "Bash(node -e \"const m = require\\('mongoose'\\); console.log\\(m.version\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(npx shadcn@latest add input --yes)",
+      "Bash(node -e \"const {jwtVerify} = require\\('jose'\\); console.log\\('jose ok'\\)\")",
+      "Bash(node -e \"console.log\\(require\\('zod/package.json'\\).version\\)\")",
+      "Bash(npx shadcn@latest add card textarea avatar badge scroll-area separator dialog --yes)",
+      "Bash(node -e \"require\\('lucide-react'\\)\")",
+      "Bash(npx tsx *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/access)",
+      "Bash(curl -s -X POST http://localhost:3000/api/access -H \"Content-Type: application/json\" -d '{\"code\":\"wrongcode\"}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} -> %{redirect_url}\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/api/characters)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3000/api/access -H \"Content-Type: application/json\" -d '{\"code\":\"wrong\"}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} -> %{redirect_url}\" http://localhost:3000/admin)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} -> %{redirect_url}\" http://localhost:3000/characters)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/access)"
     ]
   }
 }
